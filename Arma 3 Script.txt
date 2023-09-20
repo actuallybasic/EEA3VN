@@ -1,0 +1,55 @@
+
+private _modFolder = configSourceMod (configFile >> "CfgPatches" >> "rhsusf_c_weapons");
+private _itemConfigs = "configSourceMod _x isEqualTo _modFolder" configClasses (configFile >> "CfgWeapons");
+
+diag_log text "========== EXPORTING ITEMS ==========";
+
+{
+    private _classname = configName _x;
+    private _parentClassname = configName inheritsFrom _x;
+    private _displayName = getText (_x >> "displayName");
+
+    private _configPatch = configSourceAddonList _x select 0;
+    private _scope = ["private", "protected", "public"] select getNumber (_x >> "scope");
+
+    private _author = getText (_x >> "author");
+    if !((_x >> "author") in configProperties [_x, "true", false]) then {
+        _author = "Error: No author";
+    };
+
+    (_classname call BIS_fnc_itemType) params ["_category", "_type"];
+
+    diag_log text "----------";
+    diag_log text format ["    %1 (%2)", _classname, _parentClassname];
+    diag_log text format ["        Config Patch:   %1", _configPatch];
+    diag_log text format ["        Type:           %1 (%2)", _type, _category];
+    diag_log text format ["        Display Name:   %1", _displayName];
+    diag_log text format ["        Scope:          %1", _scope];
+    diag_log text format ["        Author:         %1", _author];
+
+    if (_category isEqualTo "Weapon") then {
+        private _optic = getText (_x >> "LinkedItems" >> "LinkedItemsOptic" >> "item");
+        if (_optic != "") then {
+            diag_log text format ["            Optic:          %1", _optic];
+        };
+
+        private _pointer = getText (_x >> "LinkedItems" >> "LinkedItemsAcc" >> "item");
+        if (_pointer != "") then {
+            diag_log text format ["            Pointer:        %1", _pointer];
+        };
+
+        private _silencer = getText (_x >> "LinkedItems" >> "LinkedItemsMuzzle" >> "item");
+        if (_silencer != "") then {
+            diag_log text format ["            Silencer:       %1", _silencer];
+        };
+
+        private _bipod = getText (_x >> "LinkedItems" >> "LinkedItemsUnder" >> "item");
+        if (_bipod != "") then {
+            diag_log text format ["            Bipod:          %1", _bipod];
+        };
+    };
+
+    diag_log text "";
+} forEach _itemConfigs;
+
+diag_log text "========== EXPORTING ITEMS END ==========";
